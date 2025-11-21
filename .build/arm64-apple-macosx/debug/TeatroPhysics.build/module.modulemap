@@ -1,0 +1,4 @@
+module TeatroPhysics {
+    header "/Users/benedikteickhoff/Development/Github-Desktop/FountainKit/Packages/TeatroPhysics/.build/arm64-apple-macosx/debug/TeatroPhysics.build/TeatroPhysics-Swift.h"
+    requires objc
+}
