@@ -1,7 +1,7 @@
 Teatro Stage Editor — Authoring UX Sketch
 ========================================
 
-This document describes a minimal but focused authoring surface for the Teatro Stage Engine. It assumes the engine described in the other specs (physics, rig, room, camera) and adds only what is needed for humans to _shape_ a scene: see the stage, move the puppet (or reps), and mark important instants in time.
+This document describes a minimal but focused authoring surface for the Teatro Stage Engine. It assumes the engine described in the other specs (physics, rig, room, camera) and adds only what is needed for humans to _shape_ a scene: see the stage, move the puppet (or actors), and mark important instants in time.
 
 The editor is deliberately not a full 3D package or DAW. It has three main parts:
 - the **stage view**,
@@ -14,7 +14,7 @@ The editor is deliberately not a full 3D package or DAW. It has three main parts
 The stage view shows:
 - the three‑sided room (floor + walls + door),
 - the Fadenpuppe rig (drawn from `TPPuppetSnapshot`),
-- optional representatives or props on the floor.
+- optional stage actors or props on the floor.
 
 Camera:
 - Orthographic, orbiting around Y with a fixed elevation and zoom, as per `spec/camera`.
@@ -24,8 +24,8 @@ Direct manipulations:
 - Puppet mode:
   - The only direct handle is the **bar**. Dragging it in the stage view adjusts its position in the engine; limbs respond via physics.
   - Limbs (head/hands/feet) are not individually draggable in the default mode.
-- Constellation/rep mode:
-  - Floor tokens representing reps can be dragged along the floor plane.
+- Constellation/actor mode:
+  - Floor tokens representing actors can be dragged along the floor plane.
   - Other bodies in the rig remain under physics control.
 
 The stage view should feel like a clean, isometric drawing: no gizmo clutter, no extra grids beyond what the room already implies.
@@ -79,7 +79,7 @@ The inspector is intentionally small: one or two short text fields and a handful
 -------------------------
 
 1. The author opens the Teatro Stage Editor and orbits/zooms once to get a comfortable view of the stage.
-2. They press **Record** and drag the bar to sketch a rough motion, or drag reps in constellation mode, while the engine runs at 60 Hz.
+2. They press **Record** and drag the bar to sketch a rough motion, or drag actors in constellation mode, while the engine runs at 60 Hz.
 3. They stop; the time bar now contains motion across a span of time.
 4. They scrub through time, dropping snapshots at interesting poses. At each snapshot, they may tweak the bar position slightly to refine the pose.
 5. In the inspector, they label each snapshot with a short phrase capturing its dramatic role.
@@ -97,4 +97,3 @@ Hosts like FountainKit that embed the Teatro Stage Engine and want authoring sho
 - avoid introducing instrument‑specific controls that would fragment the stage experience.
 
 The long‑term goal is that whether you open the stage in a Metal app or a web demo, the basic authoring experience feels the same: orbit, drag, record, scrub, snapshot, label.
-
