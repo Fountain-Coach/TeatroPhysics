@@ -23,5 +23,10 @@ Door (on right wall, Three.js reference):
   - Z from −4 to −1.
   - Y from 0 to 8.
 
-The puppet rig origin is near the center of the floor at `(0, 0, 0)`. Renderers should draw edges for floor and walls using these coordinates to match the JS demo.
+The puppet rig origin is near the center of the floor at `(0, 0, 0)`. Renderers MUST draw edges for floor and walls using these coordinates to match the engine’s world, and SHOULD render the door cut‑out on the right wall using the dimensions above so the stage reads as a Teatro room rather than a generic crate.
 
+Rest‑pose alignment (normative):
+- The puppet rest pose from `spec/rig-puppet/mechanics.md` places the feet at `y = 5` and the head at `y = 10`, with the rig bar at `y = 15` and the controller at `y = 19`.
+- Renderers MUST draw the floor exactly at world `y = 0` and use the same room coordinates, so that:
+  - when the feet contact the floor under gravity, their centres lie visually on the drawn floor line, and
+  - the head remains clearly below the rig bar and below the top of the room walls.

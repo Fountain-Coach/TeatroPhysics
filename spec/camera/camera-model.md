@@ -22,3 +22,8 @@ The Swift engine treats these constants as canonical:
 
 Any change to these numbers must be justified (for example, to improve readability) and propagated to renderers that want visual parity.
 
+Rest pose framing (normative):
+- With the room geometry from `spec/stage-room/room-geometry.md` and the puppet rest pose from `spec/rig-puppet/mechanics.md`, the canonical camera MUST frame the stage such that:
+  - the floor line (`y = 0`) appears as a stable baseline near the bottom of the view, and
+  - the puppet’s feet, when resting on the floor, visually touch that baseline without penetrating below it.
+- The rig bar (`y = 15`) and controller (`y = 19`) MUST appear below the top frustum edge, leaving visible headroom so the puppet reads as suspended inside the box, not cropped or sitting on a “trap door”.

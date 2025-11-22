@@ -35,12 +35,16 @@ public final class TPBody: @unchecked Sendable {
     public var velocity: TPVec3
     public var mass: Double
     public var invMass: Double
+    /// Optional half‑extents for an axis‑aligned box collider anchored at this body's position.
+    /// When nil, the body is treated as a point for collision purposes.
+    public var halfExtents: TPVec3?
 
-    public init(position: TPVec3, velocity: TPVec3 = .zero, mass: Double) {
+    public init(position: TPVec3, velocity: TPVec3 = .zero, mass: Double, halfExtents: TPVec3? = nil) {
         self.position = position
         self.velocity = velocity
         self.mass = mass
         self.invMass = mass > 0 ? 1.0 / mass : 0
+        self.halfExtents = halfExtents
     }
 }
 
@@ -72,6 +76,29 @@ public final class TPDistanceConstraint: TPConstraint {
         }
         if bodyB.invMass > 0 {
             bodyB.position = bodyB.position - impulse
+        }
+    }
+}
+
+public final class TPGroundConstraint: TPConstraint {
+    public let body: TPBody
+    public let floorY: Double
+
+    public init(body: TPBody, floorY: Double = 0) {
+        self.body = body
+        self.floorY = floorY
+    }
+
+    public func solve(dt: Double) {
+        _ = dt
+        let halfY = body.halfExtents?.y ?? 0
+        let bottomY = body.position.y - halfY
+        if bottomY < floorY {
+            let penetration = floorY - bottomY
+            body.position.y += penetration
+            if body.velocity.y < 0 {
+                body.velocity.y = 0
+            }
         }
     }
 }
@@ -109,4 +136,3 @@ public final class TPWorld: @unchecked Sendable {
         }
     }
 }
-

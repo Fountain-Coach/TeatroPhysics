@@ -28,13 +28,13 @@ public final class TPPuppetRig: @unchecked Sendable {
         world.linearDamping = 0.02
 
         controllerBody = TPBody(position: TPVec3(x: 0, y: 19, z: 0), mass: 0.1)
-        barBody = TPBody(position: TPVec3(x: 0, y: 15, z: 0), mass: 0.1)
-        torsoBody = TPBody(position: TPVec3(x: 0, y: 8, z: 0), mass: 1.0)
-        headBody = TPBody(position: TPVec3(x: 0, y: 10, z: 0), mass: 0.5)
-        handLBody = TPBody(position: TPVec3(x: -1.8, y: 8, z: 0), mass: 0.3)
-        handRBody = TPBody(position: TPVec3(x: 1.8, y: 8, z: 0), mass: 0.3)
-        footLBody = TPBody(position: TPVec3(x: -0.6, y: 5, z: 0), mass: 0.4)
-        footRBody = TPBody(position: TPVec3(x: 0.6, y: 5, z: 0), mass: 0.4)
+        barBody = TPBody(position: TPVec3(x: 0, y: 15, z: 0), mass: 0.1, halfExtents: TPVec3(x: 5.0, y: 0.1, z: 0.1))
+        torsoBody = TPBody(position: TPVec3(x: 0, y: 8, z: 0), mass: 1.0, halfExtents: TPVec3(x: 0.8, y: 1.5, z: 0.4))
+        headBody = TPBody(position: TPVec3(x: 0, y: 10, z: 0), mass: 0.5, halfExtents: TPVec3(x: 0.55, y: 0.55, z: 0.4))
+        handLBody = TPBody(position: TPVec3(x: -1.8, y: 8, z: 0), mass: 0.3, halfExtents: TPVec3(x: 0.2, y: 1.0, z: 0.2))
+        handRBody = TPBody(position: TPVec3(x: 1.8, y: 8, z: 0), mass: 0.3, halfExtents: TPVec3(x: 0.2, y: 1.0, z: 0.2))
+        footLBody = TPBody(position: TPVec3(x: -0.6, y: 5, z: 0), mass: 0.4, halfExtents: TPVec3(x: 0.25, y: 1.1, z: 0.25))
+        footRBody = TPBody(position: TPVec3(x: 0.6, y: 5, z: 0), mass: 0.4, halfExtents: TPVec3(x: 0.25, y: 1.1, z: 0.25))
 
         world.addBody(controllerBody)
         world.addBody(barBody)
@@ -64,6 +64,10 @@ public final class TPPuppetRig: @unchecked Sendable {
         addDistance(controllerBody, handRBody, stiffness: 0.9)
         // Optional reinforcing string from bar to head
         addDistance(barBody, headBody, stiffness: 0.8)
+
+        // Ground contacts for feet so the puppet does not fall through the floor plane (y = 0)
+        world.addConstraint(TPGroundConstraint(body: footLBody, floorY: 0))
+        world.addConstraint(TPGroundConstraint(body: footRBody, floorY: 0))
     }
 
     public func step(dt: Double, time: Double) {
