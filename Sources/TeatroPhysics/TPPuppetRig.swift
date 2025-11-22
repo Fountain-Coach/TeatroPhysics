@@ -1,6 +1,7 @@
 import Foundation
 
 public struct TPPuppetSnapshot: Sendable, Equatable {
+    public var controller: TPVec3
     public var bar: TPVec3
     public var torso: TPVec3
     public var head: TPVec3
@@ -12,6 +13,7 @@ public struct TPPuppetSnapshot: Sendable, Equatable {
 
 public final class TPPuppetRig: @unchecked Sendable {
     public let world: TPWorld
+    public let controllerBody: TPBody
     public let barBody: TPBody
     public let torsoBody: TPBody
     public let headBody: TPBody
@@ -25,6 +27,7 @@ public final class TPPuppetRig: @unchecked Sendable {
         world.gravity = TPVec3(x: 0, y: -9.82, z: 0)
         world.linearDamping = 0.02
 
+        controllerBody = TPBody(position: TPVec3(x: 0, y: 19, z: 0), mass: 0.1)
         barBody = TPBody(position: TPVec3(x: 0, y: 15, z: 0), mass: 0.1)
         torsoBody = TPBody(position: TPVec3(x: 0, y: 8, z: 0), mass: 1.0)
         headBody = TPBody(position: TPVec3(x: 0, y: 10, z: 0), mass: 0.5)
@@ -33,6 +36,7 @@ public final class TPPuppetRig: @unchecked Sendable {
         footLBody = TPBody(position: TPVec3(x: -0.6, y: 5, z: 0), mass: 0.4)
         footRBody = TPBody(position: TPVec3(x: 0.6, y: 5, z: 0), mass: 0.4)
 
+        world.addBody(controllerBody)
         world.addBody(barBody)
         world.addBody(torsoBody)
         world.addBody(headBody)
@@ -54,19 +58,22 @@ public final class TPPuppetRig: @unchecked Sendable {
         addDistance(torsoBody, footLBody, stiffness: 0.8)
         addDistance(torsoBody, footRBody, stiffness: 0.8)
 
-        // Strings: bar ↔ head / hands
-        addDistance(barBody, headBody, stiffness: 0.9)
-        addDistance(barBody, handLBody, stiffness: 0.9)
-        addDistance(barBody, handRBody, stiffness: 0.9)
+        // Strings: controller ↔ bar / hands
+        addDistance(controllerBody, barBody, stiffness: 0.9)
+        addDistance(controllerBody, handLBody, stiffness: 0.9)
+        addDistance(controllerBody, handRBody, stiffness: 0.9)
+        // Optional reinforcing string from bar to head
+        addDistance(barBody, headBody, stiffness: 0.8)
     }
 
     public func step(dt: Double, time: Double) {
-        driveBar(time: time)
+        driveController(time: time)
         world.step(dt: dt)
     }
 
     public func snapshot() -> TPPuppetSnapshot {
         TPPuppetSnapshot(
+            controller: controllerBody.position,
             bar: barBody.position,
             torso: torsoBody.position,
             head: headBody.position,
@@ -77,13 +84,11 @@ public final class TPPuppetRig: @unchecked Sendable {
         )
     }
 
-    private func driveBar(time: Double) {
+    private func driveController(time: Double) {
         let sway = sin(time * 0.7) * 2.0
         let upDown = sin(time * 0.9) * 0.5
-        barBody.position.x = sway
-        barBody.position.y = 15 + upDown
-        // keep bar roughly centered in z
-        barBody.position.z = 0
+        controllerBody.position.x = sway
+        controllerBody.position.y = 19 + upDown
+        controllerBody.position.z = 0
     }
 }
-
