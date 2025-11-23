@@ -114,13 +114,65 @@ Each implementation that embeds the Teatro Stage Engine is expected to carry a s
 
 Differences between backends (e.g. bounce count, exact decay curve) are acceptable as long as all normative invariants in section 4 are met.
 
-6. Usage and evolution
+6. Thrown ball scenario (natural bounce)
+----------------------------------------
+
+The drop test above validates world gravity, damping, and floor handling with a neutral initial pose. A second scenario checks that a ball can be “thrown” across the stage in a way that still looks and feels natural, without violating the same invariants.
+
+Initial state at `t = 0`:
+
+- Start from the ball at rest on the floor:
+  - Position: `p_rest = (0, r, 0)` (`r = 1`),  
+    i.e. the drop test has already settled.
+  - Velocity: `v_rest = (0, 0, 0)`.
+- Apply an instantaneous linear impulse that produces an initial horizontal velocity:
+  - Target speed: `‖v_throw‖ = 4.0` units/s.
+  - Direction: along the +X axis, i.e.  
+    `v0 = (4.0, 0, 0)`.
+
+No further impulses are applied; from this point on, only gravity, damping, and floor contact act on the ball.
+
+Simulation:
+
+- Reuse the same world configuration as in sections 1–3.
+- Simulate for `T_throw = 10` seconds with the same timestep model.
+
+Invariants (normative, in addition to those in section 4):
+
+6.1 Motion and travel
+
+- The ball MUST move a meaningful distance across the floor before coming to rest:
+  - There exists a time `t_move` in `[0, T_throw]` such that  
+    `|x_c(t_move) − x_c(0)| ≥ 2 · r` (it travels at least two radii horizontally).
+- Lateral motion remains within room bounds:
+  - For all `t` in `[0, T_throw]`, `x_c(t) ∈ [-15 + r, 15 - r]` within `ε_pos`.
+
+6.2 Settling
+
+Define `ε_vel` and `ε_pos` as in section 4.3. Then:
+
+- There exists a time `t_rest_throw ≤ T_throw` such that for all `t ≥ t_rest_throw`:
+  - `‖v(t)‖ ≤ ε_vel`, and
+  - `|y_c(t) − r| ≤ ε_pos`.
+
+This ensures that the ball does not glide indefinitely; under damping it comes to rest again on the floor.
+
+6.3 Qualitative bounce behaviour (recommended)
+
+Implementations SHOULD exhibit a visually natural bounce pattern:
+
+- After the first contact with the floor, successive peak heights of `y_c(t)` during bounces:
+  - form a strictly decreasing sequence within numerical tolerance, or
+  - are at least non‑increasing if the backend has coarse contact resolution.
+
+Tests MAY approximate this by sampling local maxima of `y_c(t)` over time and asserting that each peak is not higher than the previous one beyond a small jitter band. Differences in exact peak values between Swift and Cannon are acceptable, as long as the qualitative behaviour (decreasing bounce envelope, no energy gain) is preserved.
+
+7. Usage and evolution
 ----------------------
 
-The ball baseline is intended as a “smoke test” for the physics world:
+The ball baseline (drop + throw) is intended as a “smoke test” for the physics world:
 
-- Run this scenario first when changing integrator details, gravity, floor handling, or damping behaviour.
+- Run these scenarios first when changing integrator details, gravity, floor handling, damping behaviour, or introducing new backends.
 - Ensure both the Swift and JS/Cannon implementations continue to satisfy the invariants before moving on to more complex rigs (puppet, strings, controller).
 
 If future changes require different parameters (for example, a different damping model), update this file alongside the corresponding tests and implementations, and document any relaxed or tightened bounds.
-
