@@ -1,7 +1,7 @@
 TeatroStageEngine
 ==================
 
-TeatroStageEngine is the canonical game engine for the Teatro puppet stage: a small, pure‑Swift package that defines the physics core, puppet rig, stage geometry, and written specs for camera, visual style, and interchange. It is renderer‑agnostic by design — no Metal, SDL, or UIKit — and is meant to be embedded into hosts like FountainKit, MetalViewKit demos, or web frontends via a thin bridge.
+TeatroStageEngine is the canonical game engine for the Teatro puppet stage: a small, pure‑Swift package that defines the physics core, puppet rig, stage geometry, and written specs for camera, visual style, and interchange. Per the FountainAI hard rule, the only approved 3D host stack is Three.js + Cannon.js; keep integrations limited to that path.
 
 From the engine’s point of view, there is only:
 - a world with gravity,
@@ -36,7 +36,7 @@ This repository carries two things in lockstep:
    - `TPPuppetRig` — assembles a world matching the Fadenpuppe rig spec and exposes
      `step(dt:time:)` and `snapshot()` for hosts.
 
-The engine does not know about cameras or rooms explicitly; those are described in `spec/` and implemented in whichever renderer you plug in (MetalViewKit, Three.js, SVG, etc.).
+The engine does not know about cameras or rooms explicitly; those are described in `spec/` and implemented in the approved Three.js + Cannon.js host (or SVG for doc-only views).
 
 ## 1. World + physics core
 
@@ -92,7 +92,7 @@ TeatroStageEngine does not ship a renderer, but it does lock down the numbers an
   - Line colour `#111111`.
   - Hairline edges for room and puppet, slightly lighter shapes for floor spot and back‑wall wash.
 
-These specs give MetalViewKit, Three.js, or SVG renderers enough structure to produce the same stage picture from engine state.
+These specs give the Three.js + Cannon.js host (or SVG) enough structure to produce the same stage picture from engine state.
 
 ## 4. Interchange and integration
 
@@ -147,12 +147,12 @@ For a custom scene, work directly with `TPWorld`, `TPBody`, and `TPDistanceConst
 Current status:
 - Physics core and puppet rig are implemented in Swift.
 - Specs for camera, physics, rig, room, style, and interchange are scaffolded under `spec/`.
-- FountainKit integrates this engine via the `teatro-stage-app` demo using MetalViewKit.
+- FountainKit integrates this engine via web hosts; native Metal/SDL paths are retired in favor of Three.js + Cannon.js.
 
 Short‑term work:
 - Tighten numerical parity with the original Three.js + Cannon.js demo by aligning camera and rig parameters.
 - Add rig‑level tests that assert stability and rough motion envelopes over long runs.
-- Provide a minimal demo inside this repo (e.g. SVG or SwiftUI+Metal) that consumes `TPPuppetRig` and `spec/` without depending on FountainKit.
+- Provide a minimal demo inside this repo (e.g. SVG) that consumes `TPPuppetRig` and `spec/` without depending on FountainKit.
 
 The guiding principle is to keep this package small, deterministic, and well‑specified. New features (more constraints, contacts, additional Teatro rigs) should start as updates to `spec/` and only then appear in `Sources/`.
 
@@ -167,4 +167,3 @@ When you design or update those instruments:
 - Treat this repository as the place where changes to stage semantics are made and reviewed; FountainKit’s instruments and prompts should follow.
 
 For a more detailed mapping between TeatroStageEngine concepts and FountainKit instrument surfaces, see `docs/TeatroStage-Instruments-Map.md` in this repo and the corresponding `Design/TeatroStage-Instruments-Map.md` document in the FountainKit repository.
-
